@@ -1,0 +1,30 @@
+name: Health API CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    test-and-build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
+            
+            - name: Install python
+              run: uv python install
+            
+            - name: Install deps
+              run: uv sync --locked
+
+            - name: Run tests
+              run: uv run --locked pytest -v 
+
+            - name: Builde docker image
+              run: docker build -t health-api:${{github.sha}} .
